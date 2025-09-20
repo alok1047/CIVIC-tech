@@ -1,23 +1,29 @@
 const express = require('express');
 const cors = require('cors');
 
-// Initialize the express app
+// --- IMPORT YOUR ROUTES ---
+const authRoutes = require('./src/api/auth.routes');
+const issueRoutes = require('./src/api/issue.routes');
+const userRoutes = require('./src/api/user.routes'); // <-- IMPORT
+
 const app = express();
 
-// Middlewares
-// Enable CORS for all routes
-app.use(cors());
-
-// Express middleware to parse JSON bodies
+// --- CORE MIDDLEWARES ---
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Simple health check route
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'Server is up and running!' });
+// --- API ROUTES ---
+app.use('/api/auth', authRoutes);
+app.use('/api/issues', issueRoutes);
+app.use('/api/users', userRoutes); // <-- ADD THIS LINE
+
+// --- HEALTH CHECK ROUTE ---
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'UP', message: 'Server is healthy' });
 });
-
-// We will add the main API routes here in a future PR
-// Example: app.use('/api/v1', mainRouter);
 
 module.exports = app;
